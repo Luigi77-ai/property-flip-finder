@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Flip Finder | Análisis de Inversión Inmobiliaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a0e27;
+            --accent: #00d4aa;
+            --accent-hover: #00b894;
+            --surface: #ffffff;
+            --surface-alt: #f8f9fa;
+            --text: #1a1a1a;
+            --text-muted: #6c757d;
+            --border: #e0e0e0;
+            --error: #ef4444;
+            --success: #10b981;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .main-card {
+            background: var(--surface);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 6px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group label .required {
+            color: var(--error);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--surface);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface-alt);
+            border-radius: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            flex: 1;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-alt);
+            border-color: var(--text-muted);
+        }
+
+        .status-message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .status-message.show {
+            display: flex;
+        }
+
+        .status-message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 2px solid var(--error);
+        }
+
+        .status-message.loading {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 212, 170, 0.3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text);
+        }
+
+        .info-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-card {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        .webhook-setup {
+            background: var(--surface-alt);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .webhook-setup h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .webhook-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .webhook-input input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Property Flip Finder</h1>
+            <p>Sistema Automatizado de Búsqueda y Análisis de Propiedades para Inversión</p>
+        </div>
+
+        <div class="main-card">
+            <div class="info-box">
+                <h3>💡 ¿Cómo funciona?</h3>
+                <ul>
+                    <li>Completa la información del cliente y sus criterios de búsqueda</li>
+                    <li>El sistema buscará automáticamente en múltiples plataformas inmobiliarias</li>
+                    <li>Analizará cada propiedad calculando ganancia potencial (mínimo $70,000)</li>
+                    <li>Generará informes detallados con fotos sin marcas de agua</li>
+                    <li>Todo se organizará automáticamente en tu Google Drive</li>
+                </ul>
+            </div>
+
+            <form id="propertyForm">
+                <div class="section-title">
+                    📋 Información del Cliente
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            Nombre del Cliente <span class="required">*</span>
+                        </label>
+                        <input type="text" id="clientName" name="clientName" required placeholder="Ej: Juan Pérez">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Email del Cliente
+                        </label>
+                        <input type="email" id="clientEmail" name="clientEmail" placeholder="cliente@ejemplo.com">
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    📍 Ubicación y Criterios de Búsqueda
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>
+                            Estado <span class="required">*</span>
+                        </label>
+                        <input type="text" id="state" name="state" required placeholder="Ej: Arizona, Florida, Texas">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Código Postal (ZIP Code)
+                        </label>
+                        <input type="text" id="zipCode" name="zipCode" placeholder="Ej: 85306, 33301">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Condados o Alrededores
+                        </label>
+                        <input type="text" id="counties" name="counties" placeholder="Ej: Maricopa, Broward">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Presupuesto Máximo <span class="required">*</span>
+                        </label>
+                        <input type="number" id="maxBudget" name="maxBudget" required placeholder="Ej: 350000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>
+                        Tipo de Propiedad <span class="required">*</span>
+                    </label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="singleFamily" name="propertyType" value="single-family">
+                            <label for="singleFamily">Unifamiliar</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="multiFamily" name="propertyType" value="multi-family">
+                            <label for="multiFamily">Multifamiliar</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="condo" name="propertyType" value="condo">
+                            <label for="condo">Condominio</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="apartment" name="propertyType" value="apartment">
+                            <label for="apartment">Departamento</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="land" name="propertyType" value="land">
+                            <label for="land">Terreno</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>
+                        Estado de la Propiedad <span class="required">*</span>
+                    </label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bankOwned" name="propertyStatus" value="bank-owned">
+                            <label for="bankOwned">Bank Owned (REO)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="preForeclosure" name="propertyStatus" value="pre-foreclosure">
+                            <label for="preForeclosure">Pre-Foreclosure</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="foreclosure" name="propertyStatus" value="foreclosure">
+                            <label for="foreclosure">Foreclosure</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="auction" name="propertyStatus" value="auction">
+                            <label for="auction">Subasta</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    🔧 Configuración Adicional
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Ganancia Mínima Deseada (USD)
+                    </label>
+                    <input type="number" id="minProfit" name="minProfit" value="70000" min="0" step="1000" placeholder="70000">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Notas Adicionales
+                    </label>
+                    <textarea id="notes" name="notes" placeholder="Cualquier preferencia o requisito especial del cliente..."></textarea>
+                </div>
+
+                <div class="webhook-setup">
+                    <h3>🔗 Configuración de Make.com</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                        Pega aquí tu webhook URL de Make.com (lo configuraremos en el siguiente paso)
+                    </p>
+                    <div class="webhook-input">
+                        <input type="url" id="webhookUrl" name="webhookUrl" placeholder="https://hook.us1.make.com/tu-webhook-id" value="">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        🔄 Limpiar Formulario
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        🚀 Iniciar Búsqueda de Propiedades
+                    </button>
+                </div>
+
+                <div id="statusMessage" class="status-message">
+                    <div class="spinner"></div>
+                    <span id="statusText"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('propertyForm');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Cargar webhook URL del localStorage si existe
+        const savedWebhook = localStorage.getItem('webhookUrl');
+        if (savedWebhook) {
+            document.getElementById('webhookUrl').value = savedWebhook;
+        }
+
+        // Guardar webhook URL cuando cambia
+        document.getElementById('webhookUrl').addEventListener('change', (e) => {
+            localStorage.setItem('webhookUrl', e.target.value);
+        });
+
+        function showStatus(message, type = 'loading') {
+            statusMessage.className = `status-message show ${type}`;
+            statusText.textContent = message;
+        }
+
+        function hideStatus() {
+            statusMessage.classList.remove('show');
+        }
+
+        function resetForm() {
+            form.reset();
+            hideStatus();
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            if (!webhookUrl) {
+                showStatus('⚠️ Por favor configura tu Webhook URL de Make.com primero', 'error');
+                return;
+            }
+
+            // Recopilar datos del formulario
+            const propertyTypes = Array.from(document.querySelectorAll('input[name="propertyType"]:checked'))
+                .map(cb => cb.value);
+            
+            const propertyStatuses = Array.from(document.querySelectorAll('input[name="propertyStatus"]:checked'))
+                .map(cb => cb.value);
+
+            if (propertyTypes.length === 0) {
+                showStatus('⚠️ Selecciona al menos un tipo de propiedad', 'error');
+                return;
+            }
+
+            if (propertyStatuses.length === 0) {
+                showStatus('⚠️ Selecciona al menos un estado de propiedad', 'error');
+                return;
+            }
+
+            const formData = {
+                client: {
+                    name: document.getElementById('clientName').value,
+                    email: document.getElementById('clientEmail').value
+                },
+                searchCriteria: {
+                    state: document.getElementById('state').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    counties: document.getElementById('counties').value,
+                    maxBudget: parseInt(document.getElementById('maxBudget').value),
+                    propertyTypes: propertyTypes,
+                    propertyStatuses: propertyStatuses,
+                    minProfit: parseInt(document.getElementById('minProfit').value) || 70000
+                },
+                notes: document.getElementById('notes').value,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('Enviando datos:', formData);
+
+            showStatus('🔍 Iniciando búsqueda de propiedades...', 'loading');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showStatus('✅ ¡Búsqueda iniciada! El sistema está procesando tu solicitud. Recibirás los resultados en Google Drive.', 'success');
+                    
+                    // Opcional: limpiar el formulario después de 3 segundos
+                    setTimeout(() => {
+                        // resetForm();
+                        hideStatus();
+                    }, 5000);
+                } else {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error al conectar con Make.com. Verifica tu Webhook URL.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Validación en tiempo real
+        document.getElementById('maxBudget').addEventListener('input', (e) => {
+            if (e.target.value < 0) e.target.value = 0;
+        });
+
+        document.getElementById('minProfit').addEventListener('input', (e) => {
+            if (e.target.value < 0) e.target.value = 0;
+        });
+    </script>
+</body>
+</html>
